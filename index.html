@@ -1,0 +1,2076 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wellcee AI 个人资料完善流程 Demo</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2315966a'/%3E%3Cpath d='M8 17.2 16 9l8 8.2V25h-5.4v-5.7h-5.2V25H8z' fill='white'/%3E%3C/svg%3E" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    :root {
+      --bg: #eef5f1;
+      --phone: #fbfdfb;
+      --surface: #ffffff;
+      --surface-soft: #f4f8f5;
+      --surface-warm: #fff8ec;
+      --ink: #17261f;
+      --muted: #66746d;
+      --line: #dce8e1;
+      --brand: #15966a;
+      --brand-deep: #0f7351;
+      --brand-soft: #dff4eb;
+      --accent: #f08d44;
+      --accent-soft: #fff1df;
+      --blue: #3377cc;
+      --blue-soft: #e8f1ff;
+      --danger: #c84b4b;
+      --shadow: 0 28px 80px rgba(30, 56, 43, 0.28);
+      --card-shadow: 0 14px 34px rgba(23, 38, 31, 0.08);
+      --card-shadow-strong: 0 18px 46px rgba(23, 38, 31, 0.14);
+      --radius: 8px;
+      --safe-bottom: max(18px, env(safe-area-inset-bottom));
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(120deg, rgba(12, 55, 41, 0.72), rgba(255, 250, 241, 0.76)),
+        url("https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1800&q=82");
+      background-attachment: fixed;
+      background-position: center;
+      background-size: cover;
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      letter-spacing: 0;
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+    }
+
+    .stage {
+      min-height: 100dvh;
+      display: grid;
+      place-items: center;
+      padding: 28px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(15, 51, 38, 0.12));
+    }
+
+    .phone {
+      position: relative;
+      width: min(420px, 100%);
+      height: min(860px, calc(100dvh - 56px));
+      min-height: 720px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.72);
+      border-radius: 34px;
+      background:
+        linear-gradient(180deg, rgba(251, 253, 251, 0.96), rgba(243, 248, 245, 0.98)),
+        var(--phone);
+      box-shadow: var(--shadow);
+    }
+
+    .phone::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      border-radius: inherit;
+      box-shadow: inset 0 0 0 1px rgba(23, 38, 31, 0.08), inset 0 -18px 38px rgba(23, 38, 31, 0.04);
+      z-index: 8;
+    }
+
+    .statusbar {
+      position: absolute;
+      inset: 0 0 auto 0;
+      z-index: 4;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 26px;
+      color: rgba(23, 38, 31, 0.78);
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(251, 253, 251, 0.82);
+      backdrop-filter: blur(18px);
+    }
+
+    .status-icons {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .dot-icon {
+      width: 6px;
+      height: 6px;
+      border-radius: 99px;
+      background: currentColor;
+      opacity: 0.7;
+    }
+
+    .app {
+      position: absolute;
+      inset: 38px 0 0 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .topbar {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 58px;
+      padding: 10px 18px 8px;
+      background: rgba(251, 253, 251, 0.82);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(223, 231, 226, 0.72);
+    }
+
+    .brand-lockup {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-weight: 800;
+    }
+
+    .brand-mark {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(145deg, #13a977, #0f7351);
+      color: white;
+      box-shadow: 0 8px 18px rgba(21, 150, 106, 0.22);
+    }
+
+    .brand-text {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
+
+    .brand-name {
+      font-size: 16px;
+    }
+
+    .brand-subtitle {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .icon-button {
+      min-width: 44px;
+      min-height: 44px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 8px;
+      background: rgba(244, 248, 245, 0.5);
+      color: var(--ink);
+      cursor: pointer;
+      transition: background 160ms ease, transform 160ms ease;
+    }
+
+    .icon-button:active {
+      transform: scale(0.96);
+      background: var(--surface-soft);
+    }
+
+    .icon-button[disabled] {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .progress-wrap {
+      padding: 0 18px 12px;
+      background: rgba(251, 253, 251, 0.82);
+      border-bottom: 1px solid rgba(223, 231, 226, 0.72);
+    }
+
+    .step-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .progress-track {
+      height: 7px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #e3eee8;
+      box-shadow: inset 0 1px 2px rgba(23, 38, 31, 0.06);
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 16%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--brand), #54c29c 62%, var(--accent));
+      transition: width 280ms ease;
+    }
+
+    .screen {
+      display: none;
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      padding: 20px 18px calc(92px + var(--safe-bottom));
+      scroll-behavior: smooth;
+      background:
+        linear-gradient(180deg, rgba(251, 253, 251, 0), rgba(237, 245, 240, 0.74));
+    }
+
+    .screen.active {
+      display: block;
+      animation: enter 220ms ease both;
+    }
+
+    @keyframes enter {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 1ms !important;
+        scroll-behavior: auto !important;
+        transition-duration: 1ms !important;
+      }
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 30px;
+      padding: 0 10px;
+      border-radius: 999px;
+      color: var(--brand-deep);
+      background: rgba(223, 244, 235, 0.94);
+      border: 1px solid rgba(21, 150, 106, 0.12);
+      font-size: 12px;
+      font-weight: 800;
+      box-shadow: 0 8px 18px rgba(21, 150, 106, 0.08);
+    }
+
+    .hero-panel {
+      position: relative;
+      overflow: hidden;
+      display: grid;
+      gap: 16px;
+      padding: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(142deg, rgba(255, 255, 255, 0.98) 0%, rgba(244, 250, 247, 0.94) 48%, rgba(255, 241, 223, 0.88) 100%),
+        url("https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=960&q=80");
+      background-position: center;
+      background-size: cover;
+      background-blend-mode: screen;
+      box-shadow: var(--card-shadow-strong);
+    }
+
+    .hero-panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(90deg, rgba(21, 150, 106, 0.14), transparent 42%),
+        repeating-linear-gradient(90deg, rgba(15, 115, 81, 0.05) 0 1px, transparent 1px 76px);
+    }
+
+    .hero-panel > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .screen-title {
+      margin: 14px 0 10px;
+      font-size: clamp(26px, 8vw, 35px);
+      line-height: 1.13;
+      letter-spacing: 0;
+      color: #13251d;
+    }
+
+    .screen-copy {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.65;
+    }
+
+    .mini-phone-row {
+      display: grid;
+      grid-template-columns: 74px 1fr;
+      gap: 14px;
+      align-items: center;
+      margin-top: 6px;
+      padding: 14px;
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.86);
+      border: 1px solid rgba(223, 231, 226, 0.92);
+      box-shadow: 0 12px 24px rgba(23, 38, 31, 0.08);
+    }
+
+    .avatar {
+      width: 62px;
+      height: 62px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      border: 3px solid white;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #15966a 0%, #6db58f 52%, #f2a663 100%);
+      box-shadow: 0 10px 24px rgba(23, 38, 31, 0.16);
+      color: white;
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    .profile-mini h2 {
+      margin: 0 0 6px;
+      font-size: 16px;
+      line-height: 1.3;
+    }
+
+    .profile-mini p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .metric-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .metric {
+      position: relative;
+      overflow: hidden;
+      padding: 15px;
+      border: 1px solid rgba(220, 232, 225, 0.9);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow: var(--card-shadow);
+    }
+
+    .metric::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 4px;
+      background: linear-gradient(180deg, var(--brand), var(--accent));
+    }
+
+    .metric-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .metric-value {
+      color: var(--brand-deep);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .mini-track {
+      height: 7px;
+      overflow: hidden;
+      border-radius: 99px;
+      background: #e6eee9;
+      box-shadow: inset 0 1px 2px rgba(23, 38, 31, 0.06);
+    }
+
+    .mini-fill {
+      height: 100%;
+      width: var(--value);
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--brand), #54c29c);
+      transition: width 260ms ease;
+    }
+
+    .option-grid {
+      display: grid;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .option-card {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 42px 1fr auto;
+      align-items: center;
+      gap: 12px;
+      min-height: 74px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--ink);
+      text-align: left;
+      cursor: pointer;
+      box-shadow: 0 10px 26px rgba(23, 38, 31, 0.06);
+      transition: border 160ms ease, background 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+    }
+
+    .option-card:active,
+    .option-card.selected {
+      border-color: rgba(21, 150, 106, 0.55);
+      background: linear-gradient(135deg, rgba(223, 244, 235, 0.96), rgba(255, 248, 236, 0.74));
+      transform: scale(0.99);
+      box-shadow: 0 16px 32px rgba(21, 150, 106, 0.14);
+    }
+
+    .option-icon {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: linear-gradient(145deg, #f5faf7, #eaf3ee);
+      color: var(--brand-deep);
+      box-shadow: inset 0 -1px 0 rgba(23, 38, 31, 0.04);
+    }
+
+    .option-card.selected .option-icon {
+      background: white;
+      color: var(--brand);
+    }
+
+    .option-title {
+      display: block;
+      font-size: 15px;
+      font-weight: 850;
+      line-height: 1.25;
+    }
+
+    .option-desc {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .ai-note {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+      padding: 14px;
+      border: 1px solid rgba(21, 150, 106, 0.16);
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, rgba(223, 244, 235, 0.96), rgba(232, 241, 255, 0.76));
+      color: #164a38;
+      font-size: 13px;
+      line-height: 1.55;
+      box-shadow: 0 12px 26px rgba(21, 150, 106, 0.1);
+    }
+
+    .chat-stream {
+      display: grid;
+      gap: 14px;
+    }
+
+    .chat-message {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .chat-message.user {
+      justify-content: flex-end;
+    }
+
+    .bot-badge {
+      flex: 0 0 auto;
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: linear-gradient(145deg, #19a876, #0f7351);
+      color: white;
+      box-shadow: 0 10px 18px rgba(21, 150, 106, 0.22);
+    }
+
+    .bubble {
+      max-width: min(300px, 82%);
+      padding: 12px 13px;
+      border-radius: 8px;
+      color: var(--ink);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      box-shadow: 0 8px 20px rgba(23, 38, 31, 0.06);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .chat-message.user .bubble {
+      color: white;
+      background: linear-gradient(135deg, var(--brand), var(--brand-deep));
+      border-color: var(--brand);
+      box-shadow: 0 8px 20px rgba(21, 150, 106, 0.2);
+    }
+
+    .question-card {
+      margin-top: 16px;
+      padding: 17px;
+      border: 1px solid rgba(220, 232, 225, 0.92);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: var(--card-shadow);
+    }
+
+    .question-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .question-title {
+      margin: 12px 0 4px;
+      font-size: 18px;
+      line-height: 1.35;
+    }
+
+    .question-help {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+    }
+
+    .chip {
+      min-height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 13px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.92);
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 760;
+      cursor: pointer;
+      transition: background 160ms ease, border 160ms ease, color 160ms ease;
+    }
+
+    .chip.selected {
+      color: var(--brand-deep);
+      border-color: rgba(21, 150, 106, 0.45);
+      background: linear-gradient(135deg, rgba(223, 244, 235, 0.98), rgba(255, 248, 236, 0.78));
+      box-shadow: 0 8px 16px rgba(21, 150, 106, 0.1);
+    }
+
+    .free-input {
+      width: 100%;
+      min-height: 76px;
+      margin-top: 12px;
+      padding: 12px;
+      resize: none;
+      color: var(--ink);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fbfdfb;
+      outline: none;
+      line-height: 1.5;
+      box-shadow: inset 0 1px 0 rgba(23, 38, 31, 0.03);
+    }
+
+    .free-input:focus {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 3px rgba(21, 150, 106, 0.16);
+    }
+
+    .insight-panel {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, rgba(248, 251, 249, 0.98), rgba(255, 248, 236, 0.68));
+      border: 1px solid rgba(189, 217, 202, 0.78);
+    }
+
+    .insight-row {
+      display: flex;
+      gap: 9px;
+      align-items: flex-start;
+      color: #305747;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .version-tabs {
+      position: sticky;
+      top: -20px;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin: 16px 0;
+      padding: 10px 0;
+      background: linear-gradient(180deg, var(--phone) 0%, rgba(251, 253, 251, 0.92) 100%);
+    }
+
+    .tab {
+      min-height: 42px;
+      padding: 0 8px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.88);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 850;
+      cursor: pointer;
+      box-shadow: 0 7px 16px rgba(23, 38, 31, 0.05);
+    }
+
+    .tab.active {
+      color: var(--brand-deep);
+      border-color: rgba(21, 150, 106, 0.5);
+      background: linear-gradient(135deg, var(--brand-soft), #fff7ec);
+    }
+
+    .generated-card {
+      position: relative;
+      padding: 18px;
+      border: 1px solid rgba(220, 232, 225, 0.9);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 251, 249, 0.96));
+      box-shadow: var(--card-shadow-strong);
+    }
+
+    .generated-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 4px;
+      background: linear-gradient(180deg, var(--brand), var(--accent));
+    }
+
+    .generated-card p {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.75;
+    }
+
+    .edit-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .ghost-action {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.92);
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 850;
+      cursor: pointer;
+      box-shadow: 0 10px 22px rgba(23, 38, 31, 0.06);
+    }
+
+    .data-map {
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .data-pill {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(244, 248, 245, 0.96);
+      box-shadow: 0 8px 18px rgba(23, 38, 31, 0.05);
+    }
+
+    .data-pill strong {
+      display: block;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .data-pill span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .profile-card {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--card-shadow-strong);
+    }
+
+    .profile-cover {
+      height: 108px;
+      background:
+        linear-gradient(90deg, rgba(21, 150, 106, 0.92), rgba(240, 141, 68, 0.78)),
+        url("https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=960&q=80");
+      background-size: cover;
+      background-position: center;
+    }
+
+    .profile-body {
+      padding: 0 16px 16px;
+    }
+
+    .profile-head {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+      margin-top: -30px;
+    }
+
+    .profile-head .avatar {
+      width: 72px;
+      height: 72px;
+      font-size: 24px;
+    }
+
+    .profile-name-block {
+      padding-bottom: 4px;
+    }
+
+    .profile-name-block h2 {
+      margin: 0;
+      font-size: 20px;
+      line-height: 1.2;
+    }
+
+    .profile-name-block p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .info-box {
+      min-height: 68px;
+      padding: 12px;
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, #f6faf7, #f0f6f2);
+      border: 1px solid #e4ece7;
+    }
+
+    .info-label {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .info-value {
+      margin-top: 5px;
+      font-size: 14px;
+      font-weight: 850;
+      line-height: 1.35;
+    }
+
+    .section-title {
+      margin: 18px 0 10px;
+      font-size: 15px;
+      line-height: 1.35;
+    }
+
+    .bio {
+      margin: 0;
+      color: #33433c;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .tag-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag {
+      min-height: 32px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--surface-soft), #fff7ed);
+      color: #305747;
+      font-size: 12px;
+      font-weight: 800;
+      border: 1px solid rgba(220, 232, 225, 0.8);
+    }
+
+    .trust-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .trust-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.94);
+      font-size: 13px;
+      font-weight: 800;
+      box-shadow: 0 8px 18px rgba(23, 38, 31, 0.05);
+    }
+
+    .trust-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--brand-deep);
+      font-size: 12px;
+    }
+
+    .trust-status.pending {
+      color: var(--accent);
+    }
+
+    .usage-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .usage-card {
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      gap: 12px;
+      padding: 14px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 10px 24px rgba(23, 38, 31, 0.06);
+    }
+
+    .usage-icon {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: var(--blue-soft);
+      color: var(--blue);
+    }
+
+    .usage-card:nth-child(2) .usage-icon {
+      background: var(--brand-soft);
+      color: var(--brand-deep);
+    }
+
+    .usage-card:nth-child(3) .usage-icon {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .usage-card h3 {
+      margin: 0 0 5px;
+      font-size: 15px;
+      line-height: 1.35;
+    }
+
+    .usage-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .privacy-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .privacy-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 10px 24px rgba(23, 38, 31, 0.05);
+    }
+
+    .privacy-item strong {
+      display: block;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .privacy-item span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .segmented {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 4px;
+      padding: 4px;
+      border-radius: 8px;
+      background: linear-gradient(180deg, #f5faf7, #edf5f0);
+      border: 1px solid #e1eae5;
+    }
+
+    .segment {
+      min-width: 64px;
+      min-height: 36px;
+      padding: 0 8px;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 850;
+      cursor: pointer;
+    }
+
+    .segment.active {
+      color: var(--brand-deep);
+      background: white;
+      box-shadow: 0 4px 10px rgba(23, 38, 31, 0.08);
+    }
+
+    .final-panel {
+      margin-top: 18px;
+      padding: 16px;
+      border-radius: var(--radius);
+      background:
+        linear-gradient(135deg, rgba(23, 56, 43, 0.98), rgba(15, 115, 81, 0.92)),
+        url("https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=960&q=80");
+      background-position: center;
+      background-size: cover;
+      background-blend-mode: multiply;
+      color: white;
+      box-shadow: var(--card-shadow-strong);
+    }
+
+    .final-panel h3 {
+      margin: 0 0 8px;
+      font-size: 17px;
+    }
+
+    .final-panel p {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .bottom-bar {
+      position: absolute;
+      inset: auto 0 0 0;
+      z-index: 5;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      padding: 12px 18px var(--safe-bottom);
+      border-top: 1px solid rgba(223, 231, 226, 0.84);
+      background: rgba(251, 253, 251, 0.88);
+      backdrop-filter: blur(18px);
+    }
+
+    .primary-button,
+    .secondary-button {
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border-radius: var(--radius);
+      font-weight: 900;
+      cursor: pointer;
+      transition: transform 160ms ease, opacity 160ms ease, background 160ms ease;
+    }
+
+    .primary-button {
+      flex: 1;
+      color: white;
+      background: linear-gradient(135deg, #18a875, #0f7351);
+      box-shadow: 0 14px 28px rgba(21, 150, 106, 0.28);
+    }
+
+    .secondary-button {
+      width: 104px;
+      color: var(--ink);
+      background: rgba(244, 248, 245, 0.96);
+      border: 1px solid var(--line);
+    }
+
+    .primary-button:active,
+    .secondary-button:active,
+    .ghost-action:active,
+    .tab:active,
+    .chip:active,
+    .segment:active {
+      transform: scale(0.98);
+    }
+
+    .primary-button[disabled] {
+      opacity: 0.44;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 520px) {
+      body {
+        background: var(--phone);
+        background-image: none;
+      }
+
+      .stage {
+        display: block;
+        padding: 0;
+      }
+
+      .phone {
+        width: 100%;
+        height: 100dvh;
+        min-height: 100dvh;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      .screen {
+        padding-inline: 16px;
+      }
+
+      .screen-title {
+        font-size: clamp(25px, 8vw, 32px);
+      }
+
+      .privacy-item {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="stage">
+    <section class="phone" aria-label="Wellcee AI 个人资料完善流程原型">
+      <div class="statusbar" aria-hidden="true">
+        <span>9:41</span>
+        <span class="status-icons"><span class="dot-icon"></span><span class="dot-icon"></span><span class="dot-icon"></span></span>
+      </div>
+
+      <div class="app">
+        <header class="topbar">
+          <button class="icon-button" id="backButton" type="button" aria-label="返回上一页" disabled>
+            <i data-lucide="chevron-left" aria-hidden="true"></i>
+          </button>
+          <div class="brand-lockup" aria-label="Wellcee AI Profile Agent">
+            <div class="brand-mark"><i data-lucide="home" aria-hidden="true"></i></div>
+            <div class="brand-text">
+              <span class="brand-name">Wellcee</span>
+              <span class="brand-subtitle">AI Profile Agent</span>
+            </div>
+          </div>
+          <button class="icon-button" type="button" aria-label="关闭原型">
+            <i data-lucide="x" aria-hidden="true"></i>
+          </button>
+        </header>
+
+        <div class="progress-wrap">
+          <div class="step-meta">
+            <span id="stepLabel">资料助手</span>
+            <span id="stepCount">1 / 6</span>
+          </div>
+          <div class="progress-track" aria-hidden="true">
+            <div class="progress-fill" id="flowProgress"></div>
+          </div>
+        </div>
+
+        <section class="screen active" data-screen="0" aria-labelledby="screen-0-title">
+          <div class="hero-panel">
+            <span class="eyebrow"><i data-lucide="sparkles" aria-hidden="true"></i> AI 资料助手</span>
+            <div>
+              <h1 class="screen-title" id="screen-0-title">让 AI 帮你把个人资料说清楚</h1>
+              <p class="screen-copy">回答几个生活问题，生成更适合找房、找室友的 Wellcee 资料。</p>
+            </div>
+            <div class="mini-phone-row">
+              <div class="avatar" aria-label="用户头像示例">莉</div>
+              <div class="profile-mini">
+                <h2>一份更容易被回复的资料</h2>
+                <p>AI 会把零散偏好整理成可展示的介绍，也沉淀成可匹配的生活标签。</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="metric-list" aria-label="资料完整度">
+            <article class="metric">
+              <div class="metric-head"><span>找房推荐</span><span class="metric-value" data-metric="home">42%</span></div>
+              <div class="mini-track"><div class="mini-fill" style="--value: 42%"></div></div>
+            </article>
+            <article class="metric">
+              <div class="metric-head"><span>室友匹配</span><span class="metric-value" data-metric="mate">28%</span></div>
+              <div class="mini-track"><div class="mini-fill" style="--value: 28%"></div></div>
+            </article>
+            <article class="metric">
+              <div class="metric-head"><span>信任资料</span><span class="metric-value" data-metric="trust">55%</span></div>
+              <div class="mini-track"><div class="mini-fill" style="--value: 55%"></div></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="screen" data-screen="1" aria-labelledby="screen-1-title">
+          <span class="eyebrow"><i data-lucide="route" aria-hidden="true"></i> 第一步</span>
+          <h1 class="screen-title" id="screen-1-title">你现在最想完成什么？</h1>
+          <p class="screen-copy">选择一个目标后，AI 会跳过无关问题，只补齐真正影响匹配的信息。</p>
+
+          <div class="option-grid" role="radiogroup" aria-label="完善资料目标">
+            <button class="option-card selected" type="button" data-goal="找一个适合我的房子">
+              <span class="option-icon"><i data-lucide="building-2" aria-hidden="true"></i></span>
+              <span>
+                <span class="option-title">找一个适合我的房子</span>
+                <span class="option-desc">优先补充预算、区域、入住时间和通勤偏好。</span>
+              </span>
+              <i data-lucide="check" aria-hidden="true"></i>
+            </button>
+            <button class="option-card" type="button" data-goal="找生活节奏合拍的室友">
+              <span class="option-icon"><i data-lucide="users" aria-hidden="true"></i></span>
+              <span>
+                <span class="option-title">找生活节奏合拍的室友</span>
+                <span class="option-desc">重点理解作息、清洁、社交边界和生活底线。</span>
+              </span>
+              <i data-lucide="circle" aria-hidden="true"></i>
+            </button>
+            <button class="option-card" type="button" data-goal="发布/转租我的房源">
+              <span class="option-icon"><i data-lucide="key-round" aria-hidden="true"></i></span>
+              <span>
+                <span class="option-title">发布/转租我的房源</span>
+                <span class="option-desc">帮助你描述房源亮点和期待的租客画像。</span>
+              </span>
+              <i data-lucide="circle" aria-hidden="true"></i>
+            </button>
+            <button class="option-card" type="button" data-goal="先建立个人档案">
+              <span class="option-icon"><i data-lucide="user-round" aria-hidden="true"></i></span>
+              <span>
+                <span class="option-title">先建立个人档案</span>
+                <span class="option-desc">先沉淀基本信息，之后用于推荐、匹配和信任展示。</span>
+              </span>
+              <i data-lucide="circle" aria-hidden="true"></i>
+            </button>
+          </div>
+
+          <div class="ai-note">
+            <i data-lucide="bot" aria-hidden="true"></i>
+            <span>我会根据你的目标少问无关问题，只补齐真正影响匹配的信息。</span>
+          </div>
+        </section>
+
+        <section class="screen" data-screen="2" aria-labelledby="screen-2-title">
+          <span class="eyebrow"><i data-lucide="messages-square" aria-hidden="true"></i> AI 动态追问</span>
+          <h1 class="screen-title" id="screen-2-title">像聊天一样补齐资料</h1>
+
+          <div class="chat-stream" id="chatStream">
+            <div class="chat-message">
+              <span class="bot-badge"><i data-lucide="bot" aria-hidden="true"></i></span>
+              <div class="bubble">我先了解几个会影响找房和室友匹配的问题。你可以点选标签，也可以直接补充一句。</div>
+            </div>
+          </div>
+
+          <article class="question-card" aria-live="polite">
+            <div class="question-meta">
+              <span id="questionIndex">问题 1 / 5</span>
+              <span>约 2 分钟</span>
+            </div>
+            <h2 class="question-title" id="questionTitle">你希望住在哪个城市或区域？</h2>
+            <p class="question-help" id="questionHelp">这会用于找房推荐和房源排序。</p>
+            <div class="chips" id="chipArea"></div>
+            <textarea class="free-input" id="freeInput" placeholder="也可以自己补充，例如：希望靠近 2 号线，通勤 30 分钟内。" aria-label="补充回答"></textarea>
+            <div class="insight-panel">
+              <div class="insight-row"><i data-lucide="database" aria-hidden="true"></i><span id="dataHint">将沉淀为：城市、区域偏好、通勤优先级</span></div>
+              <div class="insight-row"><i data-lucide="message-circle-question" aria-hidden="true"></i><span id="followHint">如果回答模糊，AI 会继续追问更具体的生活场景。</span></div>
+            </div>
+          </article>
+        </section>
+
+        <section class="screen" data-screen="3" aria-labelledby="screen-3-title">
+          <span class="eyebrow"><i data-lucide="wand-sparkles" aria-hidden="true"></i> AI 内容生成</span>
+          <h1 class="screen-title" id="screen-3-title">AI 已帮你整理成个人介绍</h1>
+          <p class="screen-copy">你可以换语气或补充一句。只有点选“使用这版”后，内容才会进入个人资料。</p>
+
+          <div class="version-tabs" role="tablist" aria-label="介绍版本">
+            <button class="tab active" type="button" data-version="0">自然简洁版</button>
+            <button class="tab" type="button" data-version="1">室友友好版</button>
+            <button class="tab" type="button" data-version="2">英文版</button>
+          </div>
+
+          <article class="generated-card">
+            <p id="generatedText">我目前在上海工作，希望找一间通勤方便、氛围安静的房子。平时作息比较规律，喜欢保持公共区域整洁，偶尔做饭，可以接受有礼貌的社交，也尊重彼此的私人空间。</p>
+          </article>
+
+          <div class="edit-actions">
+            <button class="ghost-action" type="button" id="toneButton"><i data-lucide="refresh-cw" aria-hidden="true"></i>换个语气</button>
+            <button class="ghost-action" type="button" id="addLineButton"><i data-lucide="plus" aria-hidden="true"></i>补充一句</button>
+          </div>
+
+          <div class="data-map">
+            <div class="data-pill">
+              <i data-lucide="tags" aria-hidden="true"></i>
+              <span><strong>AI 理解出的生活标签</strong><span id="tagSummary">早睡、不抽烟、爱干净、轻做饭、通勤优先</span></span>
+            </div>
+            <div class="data-pill">
+              <i data-lucide="shield-check" aria-hidden="true"></i>
+              <span><strong>用户确认后再展示</strong><span>生成内容不会自动公开，确认后才进入资料预览。</span></span>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen" data-screen="4" aria-labelledby="screen-4-title">
+          <span class="eyebrow"><i data-lucide="badge-check" aria-hidden="true"></i> 资料预览</span>
+          <h1 class="screen-title" id="screen-4-title">这是别人将看到的你</h1>
+
+          <article class="profile-card">
+            <div class="profile-cover" aria-hidden="true"></div>
+            <div class="profile-body">
+              <div class="profile-head">
+                <div class="avatar" aria-label="用户头像示例">莉</div>
+                <div class="profile-name-block">
+                  <h2>莉莉</h2>
+                  <p id="previewSubtitle">AI 产品 / 上海 / 正在找房</p>
+                </div>
+              </div>
+
+              <div class="info-grid">
+                <div class="info-box">
+                  <span class="info-label" id="previewLabel1">理想区域</span>
+                  <div class="info-value" id="previewValue1">上海静安、徐汇</div>
+                </div>
+                <div class="info-box">
+                  <span class="info-label" id="previewLabel2">预算</span>
+                  <div class="info-value" id="previewValue2">4500-6500 元/月</div>
+                </div>
+                <div class="info-box">
+                  <span class="info-label" id="previewLabel3">入住时间</span>
+                  <div class="info-value" id="previewValue3">8 月上旬</div>
+                </div>
+                <div class="info-box">
+                  <span class="info-label" id="previewLabel4">目标</span>
+                  <div class="info-value" id="previewGoal">找一个适合我的房子</div>
+                </div>
+              </div>
+
+              <h3 class="section-title" id="previewBioTitle">自我介绍</h3>
+              <p class="bio" id="previewBio">我目前在上海工作，希望找一间通勤方便、氛围安静的房子。平时作息比较规律，喜欢保持公共区域整洁，偶尔做饭，可以接受有礼貌的社交，也尊重彼此的私人空间。</p>
+
+              <h3 class="section-title" id="previewTagsTitle">生活标签</h3>
+              <div class="tag-cloud" id="previewTags"></div>
+            </div>
+          </article>
+
+          <h2 class="section-title">信任资料</h2>
+          <div class="trust-list">
+            <div class="trust-item"><span>手机已验证</span><span class="trust-status"><i data-lucide="check-circle-2" aria-hidden="true"></i>已完成</span></div>
+            <div class="trust-item"><span>实名待完成</span><span class="trust-status pending"><i data-lucide="clock-3" aria-hidden="true"></i>可继续补充</span></div>
+            <div class="trust-item"><span>资料完整度</span><span class="trust-status"><i data-lucide="trending-up" aria-hidden="true"></i>82%</span></div>
+          </div>
+        </section>
+
+        <section class="screen" data-screen="5" aria-labelledby="screen-5-title">
+          <span class="eyebrow"><i data-lucide="lock-keyhole" aria-hidden="true"></i> 数据用途与控制</span>
+          <h1 class="screen-title" id="screen-5-title">这些资料会怎样帮你找到更合适的人和房？</h1>
+
+          <div class="usage-list">
+            <article class="usage-card">
+              <span class="usage-icon"><i data-lucide="map-pinned" aria-hidden="true"></i></span>
+              <div>
+                <h3>找房推荐</h3>
+                <p>根据预算、区域、通勤和生活偏好排序房源，让推荐不只看价格和距离。</p>
+              </div>
+            </article>
+            <article class="usage-card">
+              <span class="usage-icon"><i data-lucide="handshake" aria-hidden="true"></i></span>
+              <div>
+                <h3>室友匹配</h3>
+                <p>比较作息、清洁、社交边界和禁忌项，生成“为什么匹配”的解释。</p>
+              </div>
+            </article>
+            <article class="usage-card">
+              <span class="usage-icon"><i data-lucide="shield" aria-hidden="true"></i></span>
+              <div>
+                <h3>信任建设</h3>
+                <p>展示已确认资料、认证状态和表达完整度，帮助房东与室友更快判断可信度。</p>
+              </div>
+            </article>
+          </div>
+
+          <h2 class="section-title">隐私控制</h2>
+          <div class="privacy-list" id="privacyList">
+            <div class="privacy-item">
+              <span><strong>个人介绍与生活标签</strong><span>用于对外展示，也用于室友匹配解释。</span></span>
+              <div class="segmented" role="group" aria-label="个人介绍与生活标签可见范围">
+                <button class="segment active" type="button">公开展示</button>
+                <button class="segment" type="button">仅匹配</button>
+                <button class="segment" type="button">仅自己</button>
+              </div>
+            </div>
+            <div class="privacy-item">
+              <span><strong>预算、区域、入住时间</strong><span>优先用于房源推荐，不必全部公开。</span></span>
+              <div class="segmented" role="group" aria-label="预算区域入住时间可见范围">
+                <button class="segment" type="button">公开展示</button>
+                <button class="segment active" type="button">仅匹配</button>
+                <button class="segment" type="button">仅自己</button>
+              </div>
+            </div>
+            <div class="privacy-item">
+              <span><strong>实名与联系方式</strong><span>只作为平台信任信号，不直接展示敏感信息。</span></span>
+              <div class="segmented" role="group" aria-label="实名与联系方式可见范围">
+                <button class="segment" type="button">公开展示</button>
+                <button class="segment" type="button">仅匹配</button>
+                <button class="segment active" type="button">仅自己</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="final-panel">
+            <h3>Demo 结论</h3>
+            <p>AI 没有替用户做决定，而是把用户确认过的信息沉淀成可推荐、可匹配、可信任的居住档案。</p>
+          </div>
+        </section>
+      </div>
+
+      <div class="bottom-bar">
+        <button class="secondary-button hidden" id="secondaryAction" type="button">上一步</button>
+        <button class="primary-button" id="primaryAction" type="button">开始完善资料 <i data-lucide="arrow-right" aria-hidden="true"></i></button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const defaultGoal = "找一个适合我的房子";
+
+    const state = {
+      screen: 0,
+      selectedGoal: defaultGoal,
+      completeness: {
+        home: 42,
+        mate: 28,
+        trust: 55
+      },
+      answers: {},
+      currentQuestion: 0,
+      selectedTags: [],
+      generatedVersion: 0,
+      confirmedBio: ""
+    };
+
+    const screens = [...document.querySelectorAll(".screen")];
+    const backButton = document.querySelector("#backButton");
+    const primaryAction = document.querySelector("#primaryAction");
+    const secondaryAction = document.querySelector("#secondaryAction");
+    const stepLabel = document.querySelector("#stepLabel");
+    const stepCount = document.querySelector("#stepCount");
+    const flowProgress = document.querySelector("#flowProgress");
+    const chatStream = document.querySelector("#chatStream");
+    const questionIndex = document.querySelector("#questionIndex");
+    const questionTitle = document.querySelector("#questionTitle");
+    const questionHelp = document.querySelector("#questionHelp");
+    const chipArea = document.querySelector("#chipArea");
+    const freeInput = document.querySelector("#freeInput");
+    const dataHint = document.querySelector("#dataHint");
+    const followHint = document.querySelector("#followHint");
+    const generatedText = document.querySelector("#generatedText");
+    const previewBio = document.querySelector("#previewBio");
+    const previewGoal = document.querySelector("#previewGoal");
+    const previewTags = document.querySelector("#previewTags");
+    const previewSubtitle = document.querySelector("#previewSubtitle");
+    const previewBioTitle = document.querySelector("#previewBioTitle");
+    const previewTagsTitle = document.querySelector("#previewTagsTitle");
+    const tagSummary = document.querySelector("#tagSummary");
+    const previewLabels = [
+      document.querySelector("#previewLabel1"),
+      document.querySelector("#previewLabel2"),
+      document.querySelector("#previewLabel3"),
+      document.querySelector("#previewLabel4")
+    ];
+    const previewValues = [
+      document.querySelector("#previewValue1"),
+      document.querySelector("#previewValue2"),
+      document.querySelector("#previewValue3"),
+      previewGoal
+    ];
+
+    const screenLabels = ["资料助手", "目标选择", "动态追问", "生成介绍", "资料预览", "数据用途"];
+    const buttonLabels = [
+      "开始完善资料",
+      "进入 AI 追问",
+      "回答下一题",
+      "使用这版",
+      "保存并用于匹配",
+      "完成演示"
+    ];
+
+    const goalConfigs = {
+      "找一个适合我的房子": {
+        chatIntro: "我会优先问影响房源推荐的问题：区域、预算、房源条件和不可妥协项。",
+        defaultAck: "收到，这会进入找房推荐排序，让 AI 不只按价格和距离筛房。",
+        tabLabels: ["找房需求版", "自然介绍版", "英文版"],
+        tagSummary: "通勤优先、预算清晰、安静房源、近地铁、性价比",
+        tags: ["通勤优先", "预算清晰", "近地铁", "安静房源", "性价比", "安全感"],
+        previewSubtitle: "AI 产品 / 上海 / 正在找房",
+        bioTitle: "找房介绍",
+        tagsTitle: "找房偏好标签",
+        extraLine: " 我也可以灵活安排看房时间，希望沟通直接、信息透明。",
+        extraLineEn: " I am flexible with viewing times and prefer clear, transparent communication.",
+        previewFields: [
+          { label: "理想区域", key: "homeArea", fallback: "上海静安、徐汇" },
+          { label: "预算", key: "homeBudget", fallback: "4500-6500 元/月", limit: 1 },
+          { label: "优先条件", key: "homeCondition", fallback: "近地铁、安静" },
+          { label: "目标", value: "找一个适合我的房子" }
+        ],
+        questions: [
+          {
+            key: "homeArea",
+            title: "你最想住在哪个城市或区域？",
+            help: "这会用于找房推荐和房源排序。",
+            hint: "将沉淀为：城市、区域偏好、通勤优先级",
+            follow: "如果用户只选城市，AI 会继续追问通勤方式或可接受区域。",
+            chips: ["上海静安", "徐汇", "2 号线附近", "公司 30 分钟内", "离地铁近"],
+            default: ["上海静安", "徐汇"]
+          },
+          {
+            key: "homeBudget",
+            title: "你的预算范围是多少？",
+            help: "AI 会把预算和租期一起用于推荐排序。",
+            hint: "将沉淀为：预算区间、价格敏感度、租期意向",
+            follow: "如果预算比较弹性，AI 会追问最高可接受价格。",
+            chips: ["3000-4500", "4500-6500", "6500-9000", "押一付一优先", "可小幅浮动"],
+            default: ["4500-6500"]
+          },
+          {
+            key: "homeCondition",
+            title: "你更看重哪类房源条件？",
+            help: "AI 会用这些条件重排房源，不只按距离推荐。",
+            hint: "将沉淀为：房源偏好、设施需求、推荐排序权重",
+            follow: "如果选择“近地铁”，AI 会追问可接受步行到地铁站的时间。",
+            chips: ["独卫", "朝南采光", "近地铁", "安静", "可养宠"],
+            default: ["近地铁", "安静"],
+            ack: "你选择了房源条件，我会把它们作为推荐排序权重，而不是普通标签。"
+          },
+          {
+            key: "homeDealbreaker",
+            title: "哪些条件是不能妥协的？",
+            help: "硬性条件会优先过滤明显不合适的房源。",
+            hint: "将沉淀为：过滤条件、不可接受项、推荐安全边界",
+            follow: "AI 会把不能妥协项和偏好项分开，避免误伤可接受房源。",
+            chips: ["不接受长通勤", "不接受太吵", "不接受无电梯", "不接受合租", "不接受无窗"],
+            default: ["不接受长通勤", "不接受太吵"]
+          },
+          {
+            key: "homePriority",
+            title: "你希望 AI 推荐时优先考虑什么？",
+            help: "这决定推荐列表的解释方式和排序逻辑。",
+            hint: "将沉淀为：推荐策略、解释口径、个性化排序依据",
+            follow: "如果多个目标冲突，AI 会提示取舍，例如通勤更短但价格更高。",
+            chips: ["性价比", "通勤", "居住品质", "社区氛围", "安全感"],
+            default: ["通勤", "性价比"]
+          }
+        ],
+        versions: [
+          "我目前在上海工作，希望找一间通勤方便、氛围安静的房子。预算大概在 4500-6500 元/月，优先考虑静安、徐汇或地铁沿线，希望房源信息真实清晰，公共环境安全整洁。",
+          "我在上海做 AI 产品，最近想找一间更适合长期生活的房子。对我来说，通勤、安静和性价比很重要；如果房子近地铁、采光好、周边生活方便，会非常加分。",
+          "Hi, I am Lily, an AI product professional based in Shanghai. I am looking for a quiet, convenient place with a reasonable commute, ideally around Jing'an, Xuhui, or near a metro line. My budget is around RMB 4,500-6,500 per month."
+        ]
+      },
+      "找生活节奏合拍的室友": {
+        chatIntro: "我会重点理解作息、清洁、社交边界和生活底线，用来判断室友是否合拍。",
+        defaultAck: "收到，这会进入室友匹配解释，帮助双方提前看见生活节奏是否合适。",
+        tabLabels: ["自然简洁版", "室友友好版", "英文版"],
+        tagSummary: "早睡、爱干净、不抽烟、尊重边界、好沟通",
+        tags: ["早睡", "不抽烟", "爱干净", "尊重边界", "偶尔做饭", "好沟通"],
+        previewSubtitle: "AI 产品 / 上海 / 正在找室友",
+        bioTitle: "室友介绍",
+        tagsTitle: "室友匹配标签",
+        extraLine: " 我也可以中英文沟通，方便和不同背景的室友交流。",
+        extraLineEn: " I am also comfortable communicating in both Chinese and English.",
+        previewFields: [
+          { label: "日常作息", key: "mateSchedule", fallback: "工作日规律" },
+          { label: "室友关系", key: "mateRelationship", fallback: "安静独立、偶尔聊天" },
+          { label: "生活底线", key: "mateBoundary", fallback: "不抽烟、晚上安静" },
+          { label: "目标", value: "找生活节奏合拍的室友" }
+        ],
+        questions: [
+          {
+            key: "mateSchedule",
+            title: "你的日常作息更接近哪一种？",
+            help: "作息是室友匹配里最容易产生摩擦的因素。",
+            hint: "将沉淀为：作息节奏、安静时段、生活时间偏好",
+            follow: "如果选择“夜猫子”，AI 会继续确认是否会影响公共区域和睡眠时间。",
+            chips: ["早睡早起", "夜猫子", "工作日规律", "周末随意", "晚上安静"],
+            default: ["工作日规律", "晚上安静"]
+          },
+          {
+            key: "mateRelationship",
+            title: "你希望和室友保持什么关系？",
+            help: "AI 不会简单判断外向内向，而是理解互动边界。",
+            hint: "将沉淀为：社交边界、公共空间互动、室友氛围偏好",
+            follow: "你说“安静”，是指晚上安静，还是公共区域也希望少社交？",
+            chips: ["安静独立", "偶尔聊天", "可以一起做饭", "像朋友一样", "尊重边界"],
+            default: ["安静独立", "尊重边界"],
+            ack: "你提到室友关系，我会把它拆成互动频率、私人空间和公共区域边界。"
+          },
+          {
+            key: "mateClean",
+            title: "你对公共区域的期待是什么？",
+            help: "清洁标准会直接影响长期合租体验。",
+            hint: "将沉淀为：清洁标准、公共区域规则、家务协商偏好",
+            follow: "如果选择“定期打扫”，AI 会追问更希望轮流、AA 请保洁还是自由协商。",
+            chips: ["每天整洁", "定期打扫", "不堆私人物品", "可协商", "愿意轮流打扫"],
+            default: ["定期打扫", "不堆私人物品"]
+          },
+          {
+            key: "mateBoundary",
+            title: "哪些生活习惯是你的底线？",
+            help: "底线项会在室友匹配中被更高权重处理。",
+            hint: "将沉淀为：禁忌项、清洁偏好、风险过滤条件",
+            follow: "AI 会把底线和普通偏好分开，避免推荐明显不合适的人。",
+            chips: ["不抽烟", "晚上安静", "提前说访客", "不频繁聚会", "公共区域整洁"],
+            default: ["不抽烟", "晚上安静"]
+          },
+          {
+            key: "mateImpression",
+            title: "你希望别人怎样了解你？",
+            help: "AI 会把这部分写进室友介绍，让资料更有辨识度。",
+            hint: "将沉淀为：表达素材、可信人格标签、个人亮点",
+            follow: "如果你写得很口语，AI 会帮你转成自然但不夸张的介绍。",
+            chips: ["好沟通", "爱干净", "尊重边界", "作息规律", "性格随和"],
+            default: ["好沟通", "尊重边界"]
+          }
+        ],
+        versions: [
+          "我目前在上海工作，希望找到生活节奏比较合拍的室友。平时作息比较规律，喜欢保持公共区域整洁，可以接受有礼貌的社交，也尊重彼此的私人空间。",
+          "嗨，我是莉莉，目前在上海做 AI 产品。希望找到生活节奏比较合拍的室友：大家可以偶尔聊聊天、一起做饭，但也能舒服地保留自己的空间。我比较在意公共区域整洁和晚上安静，沟通上会尽量提前说明。",
+          "Hi, I am Lily, an AI product professional based in Shanghai. I keep a regular schedule, care about shared-space cleanliness, and value friendly communication with clear personal boundaries."
+        ]
+      },
+      "发布/转租我的房源": {
+        chatIntro: "我会帮你把房源亮点、适合租客和限制说明整理成可信的发布文案。",
+        defaultAck: "收到，这会进入房源文案和租客画像，帮助潜在租客更快判断是否合适。",
+        tabLabels: ["真实简洁版", "更有吸引力", "英文版"],
+        tagSummary: "近地铁、采光好、安静、长租优先、不抽烟",
+        tags: ["近地铁", "采光好", "安静", "长租优先", "不抽烟", "真实房源"],
+        previewSubtitle: "AI 产品 / 上海 / 正在转租",
+        bioTitle: "房源发布文案",
+        tagsTitle: "房源与租客标签",
+        extraLine: " 可以提供更多照片或视频看房，欢迎先简单介绍自己的入住计划。",
+        extraLineEn: " More photos or a video viewing can be provided, and a brief move-in plan is welcome.",
+        previewFields: [
+          { label: "房源亮点", key: "listingHighlight", fallback: "近地铁、采光好" },
+          { label: "适合租客", key: "tenantFit", fallback: "上班族、安静型" },
+          { label: "限制说明", key: "listingLimit", fallback: "不可抽烟、长租优先" },
+          { label: "目标", value: "发布/转租我的房源" }
+        ],
+        questions: [
+          {
+            key: "listingHighlight",
+            title: "这套房最值得被看见的亮点是什么？",
+            help: "AI 会把亮点写成真实、有吸引力的发布文案。",
+            hint: "将沉淀为：房源卖点、标题关键词、推荐曝光标签",
+            follow: "如果选择“近地铁”，AI 会追问距离地铁站大概几分钟以及是哪条线路。",
+            chips: ["近地铁", "采光好", "房间大", "小区安全", "性价比高"],
+            default: ["近地铁", "采光好"],
+            ack: "你选择了房源亮点，我会把它转成标题关键词和详情页卖点。"
+          },
+          {
+            key: "tenantFit",
+            title: "这套房适合什么样的租客？",
+            help: "租客画像会帮助系统推荐给更合适的人。",
+            hint: "将沉淀为：理想租客画像、匹配对象、沟通筛选条件",
+            follow: "如果选择“安静型”，AI 会继续确认作息、访客和聚会边界。",
+            chips: ["上班族", "学生", "安静型", "爱干净", "长租优先"],
+            default: ["上班族", "安静型"]
+          },
+          {
+            key: "listingVibe",
+            title: "房子的生活氛围是什么样？",
+            help: "这能帮助租客想象真实居住体验。",
+            hint: "将沉淀为：居住氛围、社区印象、生活方式线索",
+            follow: "如果选择“温馨”，AI 会追问公共区域、邻里和室友互动感受。",
+            chips: ["安静", "温馨", "方便", "年轻人多", "邻里友好"],
+            default: ["安静", "方便"]
+          },
+          {
+            key: "listingLimit",
+            title: "有哪些需要提前说明的限制？",
+            help: "限制写清楚能减少无效沟通，也更可信。",
+            hint: "将沉淀为：房源规则、租客筛选条件、信任提示",
+            follow: "AI 会把限制写得清楚但不生硬，避免发布文案显得劝退。",
+            chips: ["不可养宠", "不可抽烟", "限女生", "不接受短租", "需按时交租"],
+            default: ["不可抽烟", "不接受短租"]
+          },
+          {
+            key: "listingTone",
+            title: "你希望 AI 帮你生成哪种发布文案？",
+            help: "不同文案会影响点击率和回复质量。",
+            hint: "将沉淀为：文案风格、发布渠道素材、多语言版本偏好",
+            follow: "如果选择英文版，AI 会保留关键租赁信息，不直接翻译成生硬广告。",
+            chips: ["真实简洁", "更有吸引力", "英文版", "面向室友版", "强调安全"],
+            default: ["真实简洁", "更有吸引力"]
+          }
+        ],
+        versions: [
+          "这间房位于上海交通方便的区域，步行可到地铁，房间采光不错，整体氛围安静。更适合工作稳定、生活规律、爱干净的租客。希望入住前能简单沟通作息和租期，减少后续磨合。",
+          "如果你在找一间交通方便、住起来安静省心的房子，这套会比较适合。房间采光好，周边生活便利，小区安全感不错。希望租客爱干净、不抽烟，长租优先，沟通直接一点最好。",
+          "This room is in a convenient area of Shanghai, close to public transport, with good natural light and a quiet living atmosphere. It is best suited for a tidy, responsible tenant with a stable schedule. Long-term rental is preferred."
+        ]
+      },
+      "先建立个人档案": {
+        chatIntro: "我会先沉淀基础身份、城市状态、生活方式和公开范围，之后再用于推荐和信任展示。",
+        defaultAck: "收到，这会先进入基础档案，之后找房、匹配和信任展示都可以复用。",
+        tabLabels: ["个人档案版", "生活方式版", "英文版"],
+        tagSummary: "上海、AI 产品、刚搬来、爱干净、尊重边界",
+        tags: ["上海", "AI 产品", "刚搬来", "爱干净", "尊重边界", "可中英文沟通"],
+        previewSubtitle: "AI 产品 / 上海 / 个人档案",
+        bioTitle: "个人档案介绍",
+        tagsTitle: "基础档案标签",
+        extraLine: " 后续如果开始找房或找室友，也可以基于这份档案继续补充。",
+        extraLineEn: " This profile can be expanded later for housing search or roommate matching.",
+        previewFields: [
+          { label: "所在城市", key: "profileCity", fallback: "上海" },
+          { label: "身份状态", key: "profileIdentity", fallback: "上班族、刚搬来" },
+          { label: "愿意公开", key: "profileVisibility", fallback: "自我介绍、生活标签" },
+          { label: "目标", value: "先建立个人档案" }
+        ],
+        questions: [
+          {
+            key: "profileCity",
+            title: "你现在在哪个城市生活？",
+            help: "城市会影响推荐、社区内容和信任上下文。",
+            hint: "将沉淀为：当前城市、迁居状态、社区推荐范围",
+            follow: "如果选择“海外城市”，AI 会追问是否需要英文资料和跨城市找房。",
+            chips: ["北京", "上海", "广州", "深圳", "海外城市"],
+            default: ["上海"]
+          },
+          {
+            key: "profileIdentity",
+            title: "你目前的身份更接近哪一种？",
+            help: "身份不是标签化判断，而是帮助别人理解你的居住状态。",
+            hint: "将沉淀为：身份状态、租住稳定性、信任上下文",
+            follow: "如果选择“刚搬来”，AI 会追问你是正在找房，还是先了解社区信息。",
+            chips: ["学生", "上班族", "自由职业", "外籍用户", "刚搬来"],
+            default: ["上班族", "刚搬来"],
+            ack: "你选择了身份状态，我会把它用于资料背景，而不是作为硬性筛选条件。"
+          },
+          {
+            key: "profileImpression",
+            title: "你希望别人第一眼了解你的什么？",
+            help: "这决定个人档案的表达重点。",
+            hint: "将沉淀为：资料表达重点、个人亮点、信任素材",
+            follow: "如果选择“兴趣”，AI 会追问哪些兴趣适合展示在租房社区里。",
+            chips: ["职业", "性格", "生活习惯", "兴趣", "找房状态"],
+            default: ["职业", "生活习惯"]
+          },
+          {
+            key: "profileLifestyle",
+            title: "你的居住生活方式是怎样的？",
+            help: "这些标签以后可以直接复用到室友匹配。",
+            hint: "将沉淀为：生活方式标签、室友匹配素材、推荐线索",
+            follow: "如果选择“喜欢社交”，AI 会追问社交频率和公共区域边界。",
+            chips: ["安静", "爱干净", "偶尔做饭", "喜欢社交", "尊重边界"],
+            default: ["爱干净", "尊重边界"]
+          },
+          {
+            key: "profileVisibility",
+            title: "哪些信息你愿意公开展示？",
+            help: "AI 会把资料分成公开展示、仅用于匹配和仅自己可见。",
+            hint: "将沉淀为：隐私偏好、可展示字段、匹配可用字段",
+            follow: "如果选择预算区域，AI 会默认设为仅用于匹配，避免过度公开。",
+            chips: ["自我介绍", "生活标签", "预算区域", "认证状态", "联系方式不公开"],
+            default: ["自我介绍", "生活标签"]
+          }
+        ],
+        versions: [
+          "我目前在上海工作，正在逐步建立自己的 Wellcee 个人档案。平时生活比较规律，重视公共空间整洁，也希望资料能真实表达我的居住习惯，方便之后找房或找室友时更高效沟通。",
+          "嗨，我是莉莉，目前在上海做 AI 产品。刚开始完善 Wellcee 资料，希望先把城市、身份和生活方式说清楚。我的生活习惯比较稳定，爱干净，也比较尊重彼此边界。",
+          "Hi, I am Lily, an AI product professional based in Shanghai. I am building my Wellcee profile to better express my lifestyle, housing preferences, and trust signals for future housing or roommate matching."
+        ]
+      }
+    };
+
+    function createIcon() {
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
+    }
+
+    function currentConfig() {
+      return goalConfigs[state.selectedGoal] || goalConfigs[defaultGoal];
+    }
+
+    function currentQuestions() {
+      return currentConfig().questions;
+    }
+
+    function currentVersions() {
+      return currentConfig().versions;
+    }
+
+    function questionDefault(question) {
+      return question.default || question.chips.slice(0, 2);
+    }
+
+    function getAnswer(key, fallback = "", limit = 2) {
+      const question = currentQuestions().find((item) => item.key === key);
+      const values = state.answers[key] || (question ? questionDefault(question) : []);
+      if (Array.isArray(values) && values.length) {
+        return values.slice(0, limit).join("、");
+      }
+      return fallback;
+    }
+
+    function renderGenerated() {
+      const config = currentConfig();
+      const versionsForGoal = currentVersions();
+      state.generatedVersion = Math.min(state.generatedVersion, versionsForGoal.length - 1);
+      document.querySelectorAll(".tab").forEach((tab, index) => {
+        tab.textContent = config.tabLabels[index] || `版本 ${index + 1}`;
+        tab.classList.toggle("active", index === state.generatedVersion);
+      });
+      generatedText.textContent = versionsForGoal[state.generatedVersion];
+      tagSummary.textContent = config.tagSummary;
+      createIcon();
+    }
+
+    function resetFlowForGoal() {
+      const config = currentConfig();
+      state.currentQuestion = 0;
+      state.selectedTags = [];
+      state.generatedVersion = 0;
+      state.confirmedBio = "";
+      chatStream.innerHTML = `
+        <div class="chat-message">
+          <span class="bot-badge"><i data-lucide="bot" aria-hidden="true"></i></span>
+          <div class="bubble">${config.chatIntro}</div>
+        </div>
+      `;
+      renderGenerated();
+      if (state.screen === 2) {
+        renderQuestion();
+      }
+    }
+
+    function setScreen(nextScreen) {
+      state.screen = Math.max(0, Math.min(nextScreen, screens.length - 1));
+      screens.forEach((screen, index) => {
+        screen.classList.toggle("active", index === state.screen);
+        if (index === state.screen) {
+          screen.scrollTop = 0;
+        }
+      });
+      backButton.disabled = state.screen === 0;
+      secondaryAction.classList.toggle("hidden", state.screen === 0);
+      stepLabel.textContent = screenLabels[state.screen];
+      stepCount.textContent = `${state.screen + 1} / ${screens.length}`;
+      flowProgress.style.width = `${((state.screen + 1) / screens.length) * 100}%`;
+      primaryAction.innerHTML = `${buttonLabels[state.screen]} <i data-lucide="${state.screen === screens.length - 1 ? "check" : "arrow-right"}" aria-hidden="true"></i>`;
+      if (state.screen === 2) {
+        renderQuestion();
+      }
+      if (state.screen === 3) {
+        renderGenerated();
+      }
+      if (state.screen === 4) {
+        renderPreview();
+      }
+      updateMetrics();
+      createIcon();
+    }
+
+    function updateMetrics() {
+      const increments = [
+        { home: 42, mate: 28, trust: 55 },
+        { home: 52, mate: 38, trust: 59 },
+        { home: 68, mate: 66, trust: 65 },
+        { home: 76, mate: 74, trust: 73 },
+        { home: 82, mate: 82, trust: 82 },
+        { home: 86, mate: 84, trust: 86 }
+      ][state.screen];
+      Object.assign(state.completeness, increments);
+      document.querySelectorAll(".metric").forEach((metric) => {
+        const name = metric.querySelector("[data-metric]")?.dataset.metric;
+        if (!name) return;
+        const value = state.completeness[name];
+        metric.querySelector(".metric-value").textContent = `${value}%`;
+        metric.querySelector(".mini-fill").style.setProperty("--value", `${value}%`);
+      });
+    }
+
+    function addChat(text, type = "bot") {
+      const message = document.createElement("div");
+      message.className = `chat-message ${type === "user" ? "user" : ""}`;
+      if (type === "bot") {
+        message.innerHTML = `<span class="bot-badge"><i data-lucide="bot" aria-hidden="true"></i></span><div class="bubble">${text}</div>`;
+      } else {
+        message.innerHTML = `<div class="bubble">${text}</div>`;
+      }
+      chatStream.appendChild(message);
+      createIcon();
+    }
+
+    function renderQuestion() {
+      const questionsForGoal = currentQuestions();
+      const question = questionsForGoal[state.currentQuestion];
+      questionIndex.textContent = `问题 ${state.currentQuestion + 1} / ${questionsForGoal.length}`;
+      questionTitle.textContent = question.title;
+      questionHelp.textContent = question.help;
+      dataHint.textContent = question.hint;
+      followHint.textContent = question.follow;
+      freeInput.placeholder = question.placeholder || "也可以自己补充一句，让 AI 更准确理解你的需求。";
+      freeInput.value = "";
+      chipArea.innerHTML = "";
+      state.selectedTags = [...(state.answers[question.key] || questionDefault(question))].slice(0, 2);
+      question.chips.forEach((chip) => {
+        const button = document.createElement("button");
+        button.className = `chip ${state.selectedTags.includes(chip) ? "selected" : ""}`;
+        button.type = "button";
+        button.textContent = chip;
+        button.addEventListener("click", () => {
+          if (state.selectedTags.includes(chip)) {
+            state.selectedTags = state.selectedTags.filter((tag) => tag !== chip);
+          } else {
+            state.selectedTags.push(chip);
+          }
+          state.answers[question.key] = [...state.selectedTags];
+          renderQuestion();
+        });
+        chipArea.appendChild(button);
+      });
+      primaryAction.innerHTML = `${state.currentQuestion === questionsForGoal.length - 1 ? "生成个人介绍" : "回答下一题"} <i data-lucide="arrow-right" aria-hidden="true"></i>`;
+      createIcon();
+    }
+
+    function resetDemo() {
+      state.selectedGoal = defaultGoal;
+      state.answers = {};
+      document.querySelectorAll(".option-card").forEach((item, index) => {
+        item.classList.toggle("selected", index === 0);
+        const icon = item.querySelector(":scope > i");
+        if (icon) icon.setAttribute("data-lucide", index === 0 ? "check" : "circle");
+      });
+      resetFlowForGoal();
+      createIcon();
+    }
+
+    function submitQuestion() {
+      const config = currentConfig();
+      const questionsForGoal = currentQuestions();
+      const question = questionsForGoal[state.currentQuestion];
+      const typed = freeInput.value.trim();
+      if (typed) {
+        state.answers[question.key] = [...new Set([...(state.answers[question.key] || []), typed])];
+      } else {
+        state.answers[question.key] = [...state.selectedTags];
+      }
+      const answerText = (state.answers[question.key] || []).join("、") || "先按默认偏好";
+      addChat(answerText, "user");
+      if (state.currentQuestion < questionsForGoal.length - 1) {
+        addChat(question.ack || config.defaultAck);
+      }
+      if (state.currentQuestion < questionsForGoal.length - 1) {
+        state.currentQuestion += 1;
+        renderQuestion();
+      } else {
+        state.confirmedBio = currentVersions()[0];
+        setScreen(3);
+      }
+    }
+
+    function renderPreview() {
+      const config = currentConfig();
+      previewGoal.textContent = state.selectedGoal;
+      previewSubtitle.textContent = config.previewSubtitle;
+      previewBioTitle.textContent = config.bioTitle;
+      previewTagsTitle.textContent = config.tagsTitle;
+      previewBio.textContent = state.confirmedBio || currentVersions()[state.generatedVersion];
+      config.previewFields.forEach((field, index) => {
+        previewLabels[index].textContent = field.label;
+        previewValues[index].textContent = field.value || getAnswer(field.key, field.fallback, field.limit || 2);
+      });
+      previewTags.innerHTML = "";
+      config.tags.forEach((tag) => {
+        const span = document.createElement("span");
+        span.className = "tag";
+        span.textContent = tag;
+        previewTags.appendChild(span);
+      });
+    }
+
+    document.querySelectorAll(".option-card").forEach((card) => {
+      card.addEventListener("click", () => {
+        document.querySelectorAll(".option-card").forEach((item) => {
+          item.classList.remove("selected");
+          const icon = item.querySelector(":scope > i");
+          if (icon) icon.setAttribute("data-lucide", "circle");
+        });
+        card.classList.add("selected");
+        const icon = card.querySelector(":scope > i");
+        if (icon) icon.setAttribute("data-lucide", "check");
+        state.selectedGoal = card.dataset.goal;
+        state.answers = {};
+        resetFlowForGoal();
+        createIcon();
+      });
+    });
+
+    document.querySelectorAll(".tab").forEach((tab) => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".tab").forEach((item) => item.classList.remove("active"));
+        tab.classList.add("active");
+        state.generatedVersion = Number(tab.dataset.version);
+        generatedText.textContent = currentVersions()[state.generatedVersion];
+      });
+    });
+
+    document.querySelector("#toneButton").addEventListener("click", () => {
+      state.generatedVersion = (state.generatedVersion + 1) % currentVersions().length;
+      document.querySelectorAll(".tab").forEach((tab) => {
+        tab.classList.toggle("active", Number(tab.dataset.version) === state.generatedVersion);
+      });
+      generatedText.textContent = currentVersions()[state.generatedVersion];
+    });
+
+    document.querySelector("#addLineButton").addEventListener("click", () => {
+      const config = currentConfig();
+      const extra = state.generatedVersion === 2
+        ? config.extraLineEn
+        : config.extraLine;
+      if (!generatedText.textContent.includes(extra.trim())) {
+        generatedText.textContent += extra;
+      }
+    });
+
+    document.querySelectorAll(".segmented").forEach((group) => {
+      group.addEventListener("click", (event) => {
+        const target = event.target.closest(".segment");
+        if (!target) return;
+        group.querySelectorAll(".segment").forEach((segment) => segment.classList.remove("active"));
+        target.classList.add("active");
+      });
+    });
+
+    primaryAction.addEventListener("click", () => {
+      if (state.screen === 2) {
+        submitQuestion();
+        return;
+      }
+      if (state.screen === 3) {
+        state.confirmedBio = generatedText.textContent;
+      }
+      if (state.screen === screens.length - 1) {
+        resetDemo();
+        setScreen(0);
+        return;
+      }
+      setScreen(state.screen + 1);
+    });
+
+    secondaryAction.addEventListener("click", () => {
+      if (state.screen === 2 && state.currentQuestion > 0) {
+        state.currentQuestion -= 1;
+        renderQuestion();
+        return;
+      }
+      setScreen(state.screen - 1);
+    });
+
+    backButton.addEventListener("click", () => secondaryAction.click());
+
+    createIcon();
+    resetFlowForGoal();
+    renderPreview();
+    setScreen(0);
+  </script>
+</body>
+</html>
